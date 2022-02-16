@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>File upload</title>
+</head>
+<body>
+    <form action="upload" id="form">
+        <input type="file" name="image" id="image">
+        <input type="submit" value="Upload file">
+    </form>
+
+    <script>
+        let form = document.querySelector('#form');
+        form.addEventListener('submit',function(e){
+
+            // Prevent default
+            e.preventDefault();
+
+            // Grab data
+            let formData = new FormData(e.target);
+            let image = formData.get('image');
+            let imageType = image.type;
+            let imageExtension = imageType.replace('image/','');
+            let reader = new FileReader();
+            reader.addEventListener('load',function(e){
+                let imageData = e.target.result;
+                imageData = imageData.replace('data:'+imageType+';base64',"");
+                let reqObject = {
+                    "fileExtension" : imageExtension,
+                    "image": imageData
+                }
+                fetch('/upload',{
+                    method : 'POST',
+                    body:JSON.stringify(reqObject)
+                })
+                .then((response) => {
+                    return response;
+                })
+                .then(result => console.log(result)
+                )
+                .catch(e => {
+                    console.log('Error',e)
+                })
+            })
+            reader.readAsDataURL(image);
+
+
+        })
+
+    </script>
+</body>
+</html>
